@@ -7,7 +7,7 @@ const Loader = ({ color, loading, size }) => {
     return (
         <div className={css.parent}>
             <ClockLoader
-                className={css.child}
+            
             color={color}
             loading={loading}
             size={size}

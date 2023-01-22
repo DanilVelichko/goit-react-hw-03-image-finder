@@ -2,10 +2,16 @@ import React from 'react';
 import css from './Button.module.css';
 
 class Button extends React.Component {
+
+    handleLoadMore = (e) => {
+    this.props.clickMore(e)
+}
+
   render() {
     return (
-      <div>
-        <button className={css.button}>Load more</button>
+      <div className={css.loadmore_box}>
+            <button className={css.button}
+            onClick={() => this.handleLoadMore()} >Load more</button>
       </div>
     );
   }
