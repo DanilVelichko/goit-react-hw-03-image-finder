@@ -16,7 +16,7 @@ export class App extends React.Component {
   };
 
   formSubmitHandler = async input => {
-    this.cleanState();
+   await  this.cleanState();
 
     this.setState({ loading: true });
 
@@ -69,8 +69,8 @@ export class App extends React.Component {
     this.setState({ loading: false });
   };
 
-  cleanState = () => {
-    this.setState({
+  cleanState = async () => {
+   await this.setState({
       response: [],
       pageNumber: 1,
       button: false,
