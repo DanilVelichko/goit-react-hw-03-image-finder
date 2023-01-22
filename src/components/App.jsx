@@ -16,12 +16,13 @@ export class App extends React.Component {
   };
 
   formSubmitHandler = async input => {
+    this.cleanState();
+
     this.setState({ loading: true });
 
     await this.getFotos(input);
 
     this.setState({
-      pageNumber: 1,
       inputSearch: input,
       loading: false,
     });
@@ -54,7 +55,8 @@ export class App extends React.Component {
     }
   };
 
-  loadMore = async () => { //кнопка Load More 
+  loadMore = async () => {
+    //кнопка Load More
     this.setState({ loading: true });
 
     // добавляем +1 страницу к запросу
@@ -67,6 +69,13 @@ export class App extends React.Component {
     this.setState({ loading: false });
   };
 
+  cleanState = () => {
+    this.setState({
+      response: [],
+      pageNumber: 1,
+      button: false,
+    });
+  };
   render() {
     return (
       <div className={css.App}>
