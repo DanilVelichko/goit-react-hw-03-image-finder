@@ -1,18 +1,31 @@
 import React from 'react';
 import css from './Searchbar.module.css';
 
-
-
 class Searchbar extends React.Component {
+state = {
+input: '',
+}
+    handleChange = e => {
+    this.setState({
+      input: e.currentTarget.value,
+    });
+    };
+    
+handleSubmit = e => {
+    e.preventDefault();
+    this.props.clickSubmit(this.state.input);
+  };
+
+
   render() {
     return (
       <header className={css.searchbar}>
-        <form className={css.searchform}>
+        <form onSubmit={this.handleSubmit} className={css.searchform}>
           <button type="submit" className={css.searchform_button}>
             <span className={css.searchform_button_label}>Search</span>
           </button>
 
-          <input
+          <input onChange={this.handleChange}
             className={css.searchform_input}
             type="text"
             autoComplete="off"
@@ -24,6 +37,6 @@ class Searchbar extends React.Component {
       </header>
     );
   }
-}
+};
 
 export default Searchbar;
