@@ -1,11 +1,13 @@
 import React from 'react';
+import Modal from './Modal/Modal';
 import css from './App.module.css';
 import Loader from './Loader/Loader';
 import * as API from 'seervices/api';
-import Modal from './Modal/Modal';
+import Errors from './Errors/Errors';
 import Button from './Button/Button';
 import Searchbar from './Searchbar/Searchbar.jsx';
 import ImageGallery from './ImageGallery/ImageGallery';
+
 
 export class App extends React.Component {
   state = {
@@ -16,6 +18,7 @@ export class App extends React.Component {
     button: false,
     modal: false,
     largeImageUrl: '',
+    errorMessage: false,
   };
 
   formSubmitHandler = async input => {
@@ -34,18 +37,28 @@ export class App extends React.Component {
   getFotos = async input => {
     try {
       const fotoObj = await API.addFotoObj(input, this.state.pageNumber);
+      console.log(fotoObj)
 
       // Проверка на первую загрузку галереи
       if (this.state.response.length === 0) {
         await this.setState({
           response: fotoObj,
+          errorMessage: false,
         });
+
+        // Если нет результата запроса, покажем уведомление
+        if (fotoObj.length === 0) {
+          await this.setState({
+          errorMessage: true,
+        });
+        }
       }
       // Добавляем новые обьекты к уже находящимся в State
       else {
         this.setState(prevState => ({
           response: [...prevState.response, ...fotoObj],
         }));
+       
       }
       // Проверка на конец галереи
       if (fotoObj.length === 12) {
@@ -59,17 +72,13 @@ export class App extends React.Component {
   };
 
   loadMore = async () => {
-    //кнопка Load More
-    this.setState({ loading: true });
-
     // добавляем +1 страницу к запросу
     await this.setState(prevState => ({
       pageNumber: prevState.pageNumber + 1,
     }));
-    // Снова забираем фото с сервера
+
     await this.getFotos(this.state.inputSearch);
 
-    this.setState({ loading: false });
   };
 
   handleModal = event => {
@@ -93,24 +102,20 @@ export class App extends React.Component {
     });
   };
   render() {
-    const { loading, response, largeImageUrl, button, modal } = this.state;
+    const { loading, response, largeImageUrl, button, modal, errorMessage } = this.state;
     return (
       <div className={css.App}>
         <Searchbar clickSubmit={this.formSubmitHandler} />
 
         <Loader color="#4578e9" loading={loading} size={150} />
 
-        {response.length > 0 ? (
-          <ImageGallery images={response} clickImage={this.onImageClick} />
-        ) : (
-          ''
-        )}
+        {response && <ImageGallery images={response} clickImage={this.onImageClick} />}
 
+        {errorMessage && <Errors />}
+        
         {button && <Button clickMore={this.loadMore} />}
 
-        {modal && (
-          <Modal clickModal={this.handleModal} imgUrl={largeImageUrl} />
-        )}
+        {modal && <Modal clickModal={this.handleModal} imgUrl={largeImageUrl} />}
       </div>
     );
   }
