@@ -28,7 +28,15 @@ class ImageGallery extends React.Component {
 }
 
 ImageGallery.propTypes = {
-  images: PropTypes.array.isRequired,
+  images: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number,
+      key: PropTypes.number,
+      smallFoto: PropTypes.string,
+      largeFoto: PropTypes.string,
+      alt: PropTypes.string,
+    })
+  ),
   clickImage: PropTypes.func.isRequired,
 };
 
