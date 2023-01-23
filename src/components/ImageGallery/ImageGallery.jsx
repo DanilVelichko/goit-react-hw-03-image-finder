@@ -1,12 +1,17 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import css from './ImageGallery.module.css';
 import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
 
 class ImageGallery extends React.Component {
+  handleImageClick = (e) => {
+     this.props.clickImage(e.target.id)
+  }
   render() {
+    const { images } = this.props;
     return (
-      <ul className={css.gallery}>
-        {this.props.images.map(image => {
+      <ul className={css.gallery} onClick={this.handleImageClick}>
+        {images.map(image => {
           return (
             <ImageGalleryItem
               id={image.id}
@@ -21,5 +26,10 @@ class ImageGallery extends React.Component {
     );
   }
 }
+
+ImageGallery.propTypes = {
+  images: PropTypes.array.isRequired,
+  clickImage: PropTypes.func.isRequired,
+};
 
 export default ImageGallery;

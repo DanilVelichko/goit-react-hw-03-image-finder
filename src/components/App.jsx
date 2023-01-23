@@ -2,6 +2,7 @@ import React from 'react';
 import css from './App.module.css';
 import Loader from './Loader/Loader';
 import * as API from 'seervices/api';
+import Modal from './Modal/Modal';
 import Button from './Button/Button';
 import Searchbar from './Searchbar/Searchbar.jsx';
 import ImageGallery from './ImageGallery/ImageGallery';
@@ -13,10 +14,12 @@ export class App extends React.Component {
     loading: false,
     pageNumber: 1,
     button: false,
+    modal: false,
+    largeImageUrl: '',
   };
 
   formSubmitHandler = async input => {
-   await  this.cleanState();
+    await this.cleanState();
 
     this.setState({ loading: true });
 
@@ -69,27 +72,45 @@ export class App extends React.Component {
     this.setState({ loading: false });
   };
 
+  handleModal = event => {
+    if (event === 'Escape' || event === undefined) {
+      this.setState({ modal: false });
+    }
+  };
+
+  onImageClick = largeImage => {
+    this.setState({
+      modal: true,
+      largeImageUrl: largeImage,
+    });
+  };
+
   cleanState = async () => {
-   await this.setState({
+    await this.setState({
       response: [],
       pageNumber: 1,
       button: false,
     });
   };
   render() {
+    const { loading, response, largeImageUrl, button, modal } = this.state;
     return (
       <div className={css.App}>
         <Searchbar clickSubmit={this.formSubmitHandler} />
 
-        <Loader color="#4578e9" loading={this.state.loading} size={150} />
+        <Loader color="#4578e9" loading={loading} size={150} />
 
-        {this.state.response.length > 0 ? (
-          <ImageGallery images={this.state.response} />
+        {response.length > 0 ? (
+          <ImageGallery images={response} clickImage={this.onImageClick} />
         ) : (
           ''
         )}
 
-        {this.state.button && <Button clickMore={this.loadMore} />}
+        {button && <Button clickMore={this.loadMore} />}
+
+        {modal && (
+          <Modal clickModal={this.handleModal} imgUrl={largeImageUrl} />
+        )}
       </div>
     );
   }
