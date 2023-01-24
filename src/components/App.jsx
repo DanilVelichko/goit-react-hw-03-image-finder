@@ -10,7 +10,7 @@ import ImageGallery from './ImageGallery/ImageGallery';
 
 export class App extends React.Component {
   state = {
-    inputSearch: '',
+    inputSearch: 'random',
     response: [],
     loading: false,
     pageNumber: 1,
@@ -18,33 +18,40 @@ export class App extends React.Component {
     modal: false,
     largeImageUrl: '',
     errorMessage: false,
+    isLoading: false,
   };
 
-  formSubmitHandler = async input => {
+  formSubmitHandler = input => {
     this.cleanState();
 
-    await this.getFotos(input);
-
-   this.setState({
+    this.setState({
       inputSearch: input,
     });
+
+    if (this.state.inputSearch === '') {
+      this.setState({
+      inputSearch: 'random',
+    });
+    }
   };
 
   getFotos = async input => {
     this.setState({ loading: true });
     try {
       const fotoObj = await API.addFotoObj(input, this.state.pageNumber);
-    
+
       // Проверка на первую загрузку галереи
       if (this.state.response.length === 0) {
         this.setState({
           response: fotoObj,
           errorMessage: false,
+          isLoading: false
+          
         });
 
         // Если нет результата запроса, покажем уведомление
         if (fotoObj.length === 0) {
-         this.setState({
+          this.setState({
             errorMessage: true,
           });
         }
@@ -53,6 +60,7 @@ export class App extends React.Component {
       else {
         this.setState(prevState => ({
           response: [...prevState.response, ...fotoObj],
+          isLoading: false
         }));
       }
       // Проверка на конец галереи
@@ -67,17 +75,14 @@ export class App extends React.Component {
       this.setState({
         loading: false,
       });
-      
     }
   };
 
-  loadMore = async () => {
+  loadMore = () => {
     // добавляем +1 страницу к запросу
-   await this.setState(prevState => ({
+    this.setState(prevState => ({
       pageNumber: prevState.pageNumber + 1,
     }));
-
-    await this.getFotos(this.state.inputSearch);
   };
 
   handleModal = event => {
@@ -93,13 +98,28 @@ export class App extends React.Component {
     });
   };
 
-  cleanState = async () => {
-    await this.setState({
+  cleanState = () => {
+     this.setState({
       response: [],
       pageNumber: 1,
       button: false,
     });
   };
+
+ componentDidUpdate(prevProps, prevState) {
+    const { pageNumber, inputSearch } = this.state;
+    if (
+        prevState.pageNumber !== pageNumber ||
+        prevState.inputSearch !== inputSearch
+    ) {
+      if (!this.state.isLoading) {
+        this.setState({isLoading: true}, () => {
+          this.getFotos(inputSearch);
+        });
+      }
+    }
+}
+
   render() {
     const { loading, response, largeImageUrl, button, modal, errorMessage } =
       this.state;
