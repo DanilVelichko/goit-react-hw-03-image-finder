@@ -107,7 +107,8 @@ export class App extends React.Component {
   };
 
  componentDidUpdate(prevProps, prevState) {
-    const { pageNumber, inputSearch } = this.state;
+   const { pageNumber, inputSearch } = this.state;
+   
     if (
         prevState.pageNumber !== pageNumber ||
         prevState.inputSearch !== inputSearch
