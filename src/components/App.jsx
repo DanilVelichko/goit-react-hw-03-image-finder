@@ -8,7 +8,6 @@ import Button from './Button/Button';
 import Searchbar from './Searchbar/Searchbar.jsx';
 import ImageGallery from './ImageGallery/ImageGallery';
 
-
 export class App extends React.Component {
   state = {
     inputSearch: '',
@@ -22,35 +21,32 @@ export class App extends React.Component {
   };
 
   formSubmitHandler = async input => {
-    await this.cleanState();
-
-    this.setState({ loading: true });
+    this.cleanState();
 
     await this.getFotos(input);
 
-    this.setState({
+   this.setState({
       inputSearch: input,
-      loading: false,
     });
   };
 
   getFotos = async input => {
+    this.setState({ loading: true });
     try {
       const fotoObj = await API.addFotoObj(input, this.state.pageNumber);
-      console.log(fotoObj)
-
+    
       // Проверка на первую загрузку галереи
       if (this.state.response.length === 0) {
-        await this.setState({
+        this.setState({
           response: fotoObj,
           errorMessage: false,
         });
 
         // Если нет результата запроса, покажем уведомление
         if (fotoObj.length === 0) {
-          await this.setState({
-          errorMessage: true,
-        });
+         this.setState({
+            errorMessage: true,
+          });
         }
       }
       // Добавляем новые обьекты к уже находящимся в State
@@ -58,7 +54,6 @@ export class App extends React.Component {
         this.setState(prevState => ({
           response: [...prevState.response, ...fotoObj],
         }));
-       
       }
       // Проверка на конец галереи
       if (fotoObj.length === 12) {
@@ -68,17 +63,21 @@ export class App extends React.Component {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      this.setState({
+        loading: false,
+      });
+      
     }
   };
 
   loadMore = async () => {
     // добавляем +1 страницу к запросу
-    await this.setState(prevState => ({
+   await this.setState(prevState => ({
       pageNumber: prevState.pageNumber + 1,
     }));
 
     await this.getFotos(this.state.inputSearch);
-
   };
 
   handleModal = event => {
@@ -102,20 +101,25 @@ export class App extends React.Component {
     });
   };
   render() {
-    const { loading, response, largeImageUrl, button, modal, errorMessage } = this.state;
+    const { loading, response, largeImageUrl, button, modal, errorMessage } =
+      this.state;
     return (
       <div className={css.App}>
         <Searchbar clickSubmit={this.formSubmitHandler} />
 
         <Loader color="#4578e9" loading={loading} size={150} />
 
-        {response && <ImageGallery images={response} clickImage={this.onImageClick} />}
+        {response && (
+          <ImageGallery images={response} clickImage={this.onImageClick} />
+        )}
 
         {errorMessage && <Errors />}
-        
+
         {button && <Button clickMore={this.loadMore} />}
 
-        {modal && <Modal clickModal={this.handleModal} imgUrl={largeImageUrl} />}
+        {modal && (
+          <Modal clickModal={this.handleModal} imgUrl={largeImageUrl} />
+        )}
       </div>
     );
   }
